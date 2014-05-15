@@ -1,0 +1,6 @@
+ce sz: 99, b_ct: 65274, b_eg: (9,80), new c: 0 psen: 4843 q sz:1 ini:0
+ce sz: 99, b_ct: 66335, b_eg: (8,20), new c: 1 psen: 4848 q sz:1 ini:0
+ce sz: 99, b_ct: 78186, b_eg: (14,97), new c: 1 psen: 4850 q sz:1 ini:0
+ce sz: 99, b_ct: 57544, b_eg: (52,55), new c: 0 psen: 4848 q sz:1 ini:0
+ce sz: 99, b_ct: 51189, b_eg: (31,73), new c: 0 psen: 4838 q sz:11 ini:0
+ce sz: 99, b_ct: 46685, b_eg: (17,49), new c: 0 psen: 4831 q sz:21 ini:0
