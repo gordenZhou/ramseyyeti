@@ -388,6 +388,7 @@ void randomgenrow(int gsize){
     int same;
     int a = 1;
     int step = 0;
+    int tt = 0;
     FILE* logfp = fopen("../log/cyclog.txt","a");
     while (a == 1){
 
@@ -431,9 +432,10 @@ void randomgenrow(int gsize){
             if (same >= 5)
                 break;
         }
-        if (same >= 5){
+        if (same >= 5 && tt %10 == 0){
             fprintf(logfp,"same: %d, step: %d\n",same,step);
         }
+        tt++;
     }
     for (j=0;j<gsize;j++)
         fprintf(logfp,"%d ",r[j]);
