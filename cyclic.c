@@ -432,8 +432,8 @@ void randomgenrow(int gsize){
             if (same >= 5)
                 break;
         }
-        if (same >= 5 && tt %10 == 0){
-            fprintf(logfp,"same: %d, step: %d\n",same,step);
+        if (same >= 5 && tt %100 == 0){
+            fprintf(logfp,"same: %d, step: %d tt: %d\n",same,step,tt);
         }
         tt++;
     }
