@@ -90,7 +90,7 @@ int maxlin(int a,int b){
 }
 
 void outputtofile(char* ostr){
-    FILE* ofp = fopen("./log.txt","a");
+    FILE* ofp = fopen("../log/log.txt","a");
     fprintf("%s",ostr);
     fclose(ofp);
 }
@@ -437,7 +437,7 @@ int main(int argc,char *argv[])
 		exit(1);
 	}
 	
-    FILE *ofp = fopen("./r66.txt","w");
+    FILE *ofp = fopen("../log/r66.txt","w");
 
 	/*
 	 * while we do not have a publishable result
@@ -621,7 +621,7 @@ int main(int argc,char *argv[])
         ffct = FIFOCount(taboo_list);
         
 		if (ffct % 10 == 1 || (ffct >= gsize * maxlin(6,gsize/10) && psen >= gsize*3)){
-            FILE* logfp = fopen("./log.txt","a");
+            FILE* logfp = fopen("../log/log.txt","a");
             fprintf(logfp,"ce sz: %d, b_ct: %d, b_eg: (%d,%d), new c: %d psen: %d q sz:%d ini:%d\n",
 			gsize,
 			best_count,
