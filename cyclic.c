@@ -388,7 +388,7 @@ void randomgenrow(int gsize){
     int same;
     int a = 1;
     int step = 0;
-    FILE* logfp = fopen("./log.txt","a");
+    FILE* logfp = fopen("./cyclog.txt","a");
     while (a == 1){
 
         r[0] = 0;
