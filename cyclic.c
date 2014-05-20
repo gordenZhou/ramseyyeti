@@ -388,6 +388,7 @@ void randomgenrow(int gsize){
     int same;
     int a = 1;
     int step = 0;
+    FILE* logfp = fopen("./log.txt","a");
     while (a == 1){
 
         r[0] = 0;
@@ -431,11 +432,12 @@ void randomgenrow(int gsize){
                 break;
         }
         if (same >= 5){
-            printf("same: %d, step: %d\n",same,step);
+            fprintf(logfp,"same: %d, step: %d\n",same,step);
         }
     }
     for (j=0;j<gsize;j++)
-        printf("%d ",r[j]);
+        fprintf(logfp,"%d ",r[j]);
+    fclose(logfp);
     free(r);
 }
 
