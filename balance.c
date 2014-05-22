@@ -438,7 +438,7 @@ int main(int argc,char *argv[])
 		exit(1);
 	}
 	
-    FILE *ofp = fopen("../log/balancer66.txt","w");
+    FILE *ofp = fopen("../data/balancer66.txt","w");
 
 	/*
 	 * while we do not have a publishable result
