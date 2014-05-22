@@ -578,10 +578,23 @@ int main(int argc,char *argv[])
 			}
 		}
         if (carray[0] < best_count){
+        	if (best_count > 30000)
+        		i = 50;
+        	else if (best_count > 20000)
+        		i = 5;
+        	else
+        		i = 1;
+        	
+            for (ini = 0;ini<i;ini++){
+            	if (carray[ini] >= best_count)
+            		break;
+            	best_i = iarray[ini];
+            	best_j = jarray[ini];
+            	g[best_i*gsize+best_j] = 1 - g[best_i*gsize+best_j];
+            	FIFOInsertEdge(taboo_list,best_i,best_j);	
+            }
+            best_count = CliqueCount(g,gsize);
             ini = 0;
-            best_count = carray[0];
-            best_i = iarray[0];
-            best_j = jarray[0];
         }else{
             lottery = 0;
             k = 50;
@@ -599,6 +612,9 @@ int main(int argc,char *argv[])
                     break;
                 }
             }
+
+            g[best_i*gsize+best_j] = 1 - g[best_i*gsize+best_j];
+            FIFOInsertEdge(taboo_list,best_i,best_j);
         }
 
 		if(best_count == BIGCOUNT) {
@@ -607,21 +623,12 @@ int main(int argc,char *argv[])
 			exit(1);
 		}
 		
-		/*
-		 * keep the best flip we saw
-		 */
-		g[best_i*gsize+best_j] = 1 - g[best_i*gsize+best_j];
-
-		/*
-		 * taboo this graph configuration so that we don't visit
-		 * it again
-		 */
-		//count = CliqueCount(g,gsize);
-		FIFOInsertEdge(taboo_list,best_i,best_j);
 //		FIFOInsertEdgeCount(taboo_list,best_i,best_j,count);
+		checkcount++;
         ffct = FIFOCount(taboo_list);
         
-		if (ffct % 10 == 1 || (ffct >= gsize * maxlin(6,gsize/10) && psen >= gsize*3)){
+		if (checkcount % 10 == 1 || (ffct >= gsize * maxlin(6,gsize/10) && psen >= gsize*3)){
+			ffct = FIFOCount(taboo_list);
             FILE* logfp = fopen("../log/balancelog.txt","a");
             fprintf(logfp,"ce sz: %d, b_ct: %d, b_eg: (%d,%d), new c: %d psen: %d q sz:%d ini:%d\n",
 			gsize,
@@ -635,8 +642,19 @@ int main(int argc,char *argv[])
             fclose(logfp);
         }
         if (ini > 0){
+        	outputtofile("Reset 100 Edges\n");
+
+        	for (ini=0;ini<300;ini++){
+                i = rand()%gsize;
+                j = rand()%gsize;
+                if (i<=j)
+                    g[i*gsize+j] = 1 - g[i*gsize+j];
+                else
+                    g[j*gsize+i] = 1 - g[j*gsize+i];
+            }
+            
             outputtofile("Reset Edges To Balance\n");
-            fflush(stdout);
+            
             FILE* logfp = fopen("../log/balancelog.txt","a");
             for (i=0;i<gsize;i++){
             	ones = 0;
