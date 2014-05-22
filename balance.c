@@ -635,7 +635,7 @@ int main(int argc,char *argv[])
             fclose(logfp);
         }
         if (ini > 0){
-            outputtofile("Reset 100 Edges\n");
+            outputtofile("Reset Edges To Balance\n");
             fflush(stdout);
             FILE* logfp = fopen("../log/balancelog.txt","a");
             for (i=0;i<gsize;i++){
@@ -647,7 +647,7 @@ int main(int argc,char *argv[])
             			ones++;
             	}
             	flips = 0;
-            	if (ones - gsize/2 >= 3){
+            	if (ones - gsize/2 >= 2){
         			for (j=0;j<gsize;j++){
 	        			if (i <= j && g[i*gsize+j] == 1 && (rand() % ones)<=(ones - gsize/2)){
 	        				g[i*gsize+j] = 0;
@@ -660,7 +660,7 @@ int main(int argc,char *argv[])
 	            		}
         			}	
         		}
-        		if (gsize/2 - ones >= 3){
+        		if (gsize/2 - ones >= 2){
         			for (j=0;j<gsize;j++){
         				if (i <= j && g[i*gsize+j] == 0 && (rand() % (gsize-ones))<=(gsize/2 - ones)){
         					g[i*gsize+j] = 1;
@@ -674,7 +674,7 @@ int main(int argc,char *argv[])
 	            			
         			}
         		}
-        		if (abs(ones - gsize/2) >= 3){
+        		if (abs(ones - gsize/2) >= 2){
         			fprintf(logfp,"one's: %d at line %d, flip:%d\n",ones,i,flips);
         		}
             }
