@@ -39,7 +39,7 @@ void PrintGraph(int *g, int gsize,FILE *ofp)
 		for(j=0; j < gsize; j++)
 		{
 			if (j>=i) fprintf(ofp,"%d",g[i*gsize+j]);
-            else fprintf(ofp,"%d",g[j*gsize+i]);
+            else fprintf(ofp,"%d",g[i*gsize+j]);
 		}
 		fprintf(ofp,"\n");
 	}
@@ -373,9 +373,166 @@ void* CliqueCountLin(int *g,
     return(edge_list);
 }
 
-void iterategenrow(int gsize){
+int* iterategenrow(int gsize){
+	// set a cap for the news, then we can have different range of combinations.
+	printf("Start Iterating %d\n",gsize);
     int n = gsize/2;
     int k = n/2;
+
+    int s=0,news=0;
+    int f=0;
+
+    int end;
+
+    int i,j,d;
+    int same;
+
+    int *ret = (int *)malloc((n-k+1)*sizeof(int));
+    int *row = (int *)malloc((n+1)*sizeof(int));
+    int *wholerow = (int *)malloc(gsize*sizeof(int));
+    int *newret;
+    for(i=1;i<n-k+2;i++){
+        ret[i-1] = i;
+    }
+    s = n-k+1;
+
+    int x,step,kk;
+    for (d=1;d<k;d++){
+        //newret = []
+        news = 0;
+
+        for (i=0;i<s;i++){
+        	f = ret[i*d+d-1];
+            
+            for (x=0;x<n+1;x++)
+                row[x] = 0;
+        	for (x=0;x<d;x++)
+        		row[ret[i*d+x]] = 1;
+
+        	if (d == k-1){
+	        	for(kk=0;kk<=n;kk++)
+					wholerow[kk] = row[kk];
+				for(kk=gsize-1;kk>n;kk--)
+					wholerow[kk] = row[gsize-kk];
+			}
+
+            same = 0;
+            for(j=f+1;j<n-k+2+d;j++){
+				row[j] = 1;
+				if (d == k-1){
+					wholerow[j] = row[j];
+					wholerow[gsize-j] = row[j];
+
+					end = gsize/5;
+					for(step=1;step<=end;step++){
+						same = 1;
+						for(kk=1;kk<5;kk++)
+							if (wholerow[kk*step] == wholerow[(kk+1) * step])
+								same++;
+						if (same >= 5)
+							break;
+					}
+					row[j] = 0;
+					wholerow[j] = row[j];
+					wholerow[gsize-j] = row[j];
+					if (same>=5)
+						continue;
+				}
+				else{
+					end = j/5;
+
+	                for(step=1;step <= end;step++){
+	                    same = 1;
+	                    for(kk=1;kk<5;kk++)
+	                        if (row[kk*step] == row[(kk+1)*step])
+	                            same++;
+	                    if (same >= 5)
+	                    	break;
+	                }
+	                row[j] = 0;
+
+	                if (same >= 5)
+	                    continue;
+	            }
+                news++;
+            }
+            if (news > 100000)
+            	break;
+        }
+        newret = (int *)malloc((news)*(d+1)*sizeof(int));
+        news = 0;
+
+        for (i=0;i<s;i++){
+        	f = ret[i*d+d-1];
+            
+            for (x=0;x<n+1;x++)
+                row[x] = 0;
+        	for (x=0;x<d;x++)
+        		row[ret[i*d+x]] = 1;
+
+        	if (d == k-1){
+	        	for(kk=0;kk<=n;kk++)
+					wholerow[kk] = row[kk];
+				for(kk=gsize-1;kk>n;kk--)
+					wholerow[kk] = row[gsize-kk];
+			}
+            same = 0;
+            for(j=f+1;j<n-k+2+d;j++){
+            	
+				row[j] = 1;
+				if (d == k-1){
+					wholerow[j] = row[j];
+					wholerow[gsize-j] = row[j];
+
+					end = gsize/5;
+					for(step=1;step<=end;step++){
+						same = 1;
+						for(kk=1;kk<5;kk++)
+							if (wholerow[kk*step] == wholerow[(kk+1) * step])
+								same++;
+						if (same >= 5)
+							break;
+					}
+					row[j] = 0;
+					wholerow[j] = row[j];
+					wholerow[gsize-j] = row[j];
+					if (same>=5)
+						continue;
+				}
+				else{
+					end = j/5;
+	                for(step=1;step <= end;step++){
+	                    same = 1;
+	                    for(kk=1;kk<5;kk++)
+	                        if (row[kk*step] == row[(kk+1)*step])
+	                            same++;
+	                    if (same >= 5)
+	                    	break;
+	                }
+	                row[j] = 0;
+	                if (same >= 5)
+	                    continue;
+				}
+                for (x=0;x<d;x++)
+                	newret[news*(d+1)+x] = ret[i*d+x];
+                newret[news*(d+1)+d] = j;
+                news++;
+        	}
+        	if (news > 100000)
+            	break;
+        }
+        free(ret);
+        ret = newret;
+        s = news;
+    }
+    printf("(%d,%d) = %d\n",n,k,s);
+    for(i=0;i<3;i++){
+    	for(j=0;j<k;j++)
+    		printf("%d ",ret[k*i+j]);
+    	printf("\n");
+    }
+    ret[0] = s;
+    return ret;
 }
 
 void randomgenrow(int gsize){
@@ -416,9 +573,11 @@ void randomgenrow(int gsize){
             tmp = rand() % 2;
             if (tmp == 0){
                 r[j] = 0;
+                r[gsize-j] = 0;
                 zeros--;
             }else{
                 r[j] = 1;
+                r[gsize-j] = 1;
                 ones--;
             }
             j++;
@@ -445,38 +604,29 @@ void randomgenrow(int gsize){
 
 int main(int argc,char *argv[])
 {
-    srand(time(NULL));
 	int *g;
-	int *new_g;
 	int gsize;
-	int count;
-	int i;
-	int j;
-	int best_count;
-	int best_i;
-	int best_j;
-	void *taboo_list;
-    void *edge_list;
-	int psen = 0;
-	int precount = 0;
-	int checkcount = 0;
-    int ffct = 0;
-    int rbk = 0;
-    int ini;
-    int lottery;
+	int count=0;
+	int i,j;
+	
     int k;
     
-    int* carray = (int *)malloc(50*sizeof(int));
-    int* iarray = (int *)malloc(50*sizeof(int));
-    int* jarray = (int *)malloc(50*sizeof(int));
-    
-    randomgenrow(99);
-    if (1 == 1)
-        return 1;
+    gsize = 69;
+    int n = gsize/2;
+    k = n/2;
+
+    //randomgenrow(99);
+    int* ret = iterategenrow(gsize);
+    int s = ret[0];
+    ret[0] = 1; 
+    if (1 == 2){
+       return 1;
+    }
+     
 	/*
 	 * start with graph of size 8
 	 */
-	gsize = 99;
+	
 	g = (int *)malloc(gsize*gsize*sizeof(int));
 	if(g == NULL) {
 		exit(1);
@@ -484,272 +634,40 @@ int main(int argc,char *argv[])
     /*
 	 * start out with random
 	 */
-	memset(g,0,gsize*gsize*sizeof(int));
-    for (i=0;i<gsize;i++){
-        for(j=i+1;j<gsize;j++)
-            g[i*gsize+j] = rand()%2;
-    }
-
-    /*
-     *  start from a file
-     */
-    //gsize = 98;
-    //g = readinsolution(98);
-
-	/*
-	 * make a fifo to use as the taboo list
-	 */
-    
-	taboo_list = FIFOInitEdge(TABOOSIZE);
-	if(taboo_list == NULL) {
-		exit(1);
-	}
-    edge_list = FIFOInitEdge(gsize*gsize/2);
-    if(edge_list == NULL) {
-		exit(1);
-	}
-	
-    FILE *ofp = fopen("../data/r66.txt","w");
-
-	/*
-	 * while we do not have a publishable result
-	 */
-	while(gsize < 101)
-	{
-		/*
-		 * find out how we are doing
-		 */
-		count = CliqueCount(g,gsize);
-		precount = count;
-
-		/*
-		 * if we have a counter example
-		 */
-		if(count == 0)
-		{
-			printf("Eureka!  Counter-example found!\n");
-			PrintGraph(g,gsize,ofp);
-			/*
-			 * make a new graph one size bigger
-			 */
-			new_g = (int *)malloc((gsize+1)*(gsize+1)*sizeof(int));
-			if(new_g == NULL){
-                fclose(ofp);
-				exit(1);
-            }
-			/*
-			 * copy the old graph into the new graph leaving the
-			 * last row and last column alone
-			 */
-			CopyGraph(g,gsize,new_g,gsize+1);
-
-			/*
-			 * zero out the last column and last row
-			 */
-			for(i=0; i < (gsize+1); i++)
-			{
-				new_g[i*(gsize+1) + gsize] = rand() % 2; // last column
-				new_g[gsize*(gsize+1) + i] = 0; // last row
-			}
-
-			/*
-			 * throw away the old graph and make new one the
-			 * graph
-			 */
-			free(g);
-			g = new_g;
-			gsize = gsize+1;
-            rbk = 0;
-
-			/*
-			 * reset the taboo list for the new graph
-			 */
-			taboo_list = FIFOResetEdge(taboo_list);
-
-			/*
-			 * keep going
-			 */
-            break;
-			//continue;
-		}
-
-		/*
-		 * otherwise, we need to consider flipping an edge
-		 *
-		 * let's speculative flip each edge, record the new count,
-		 * and unflip the edge.  We'll then remember the best flip and
-		 * keep it next time around
-		 *
-		 * only need to work with upper triangle of matrix =>
-		 * notice the indices
-		 */
-		best_count = precount;//BIGCOUNT;
-
-		edge_list = CliqueCountLin(g,gsize,edge_list);
-		psen = 0;
-        for(i=0;i<50;i++){
-            carray[i] = BIGCOUNT;
-            iarray[i] = -1;
-            jarray[i] = -1;
-        }
-		for(i=0; i < gsize; i++)
-		{
-			for(j=i+1; j < gsize; j++)
-			{
-				if (!FIFOFindEdge(edge_list,i,j) || FIFOFindEdge(taboo_list,i,j))
-					continue;
-
-				//FIFODeleteEdge(edge_list,i,j);
-				/*
-				 * flip it
-				 */
-				g[i*gsize+j] = 1 - g[i*gsize+j];
-				//count = CliqueCount(g,gsize);
-				count = CliqueCountFourD(g,gsize,i,j,precount);
-				//checkcount = CliqueCount(g,gsize);
-				//if (count != checkcount){
-				//	printf("count: %d checkcount: %d\n", count,checkcount);
-				//	exit(1);
-				//}
-				psen++;
-				/*
-				 * is it better and the i,j,count not taboo?
-				 */
-                ini = 49;
-                for(;ini>=0;ini--){
-                    if (count < carray[ini]){
-                        if (carray[ini] < BIGCOUNT && ini<49){
-                            carray[ini+1] = carray[ini];
-                            iarray[ini+1] = iarray[ini];
-                            jarray[ini+1] = jarray[ini];
-                        }
-                    }else{
-                        break;
-                    }
-                }
-                if (ini<49){
-                    carray[ini+1] = count;
-                    iarray[ini+1] = i;
-                    jarray[ini+1] = j;
-                }
- 				/*if((count < best_count) &&
-					!FIFOFindEdge(taboo_list,i,j))
-//					!FIFOFindEdgeCount(taboo_list,i,j,count))
-				{
-					best_count = count;
-					best_i = i;
-					best_j = j;
-				}*/
-                
-
-				/*
-				 * flip it back
-				 */
-				g[i*gsize+j] = 1 - g[i*gsize+j];
-			}
-		}
-        if (carray[0] < best_count){
-            ini = 0;
-            best_count = carray[0];
-            best_i = iarray[0];
-            best_j = jarray[0];
-        }else{
-            lottery = 0;
-            k = 50;
-            for (ini = 0;ini<50;ini++)
-                if (carray[ini] < BIGCOUNT)
-                    lottery = lottery + 10;
-            lottery = rand() % lottery;
-            for (ini = 0;ini<50;ini++){
-                lottery = lottery-10;
-                k--;
-                if (lottery <=0){
-                    best_count = carray[ini];
-                    best_i = iarray[ini];
-                    best_j = jarray[ini];
-                    break;
-                }
-            }
-        }
-
-		if(best_count == BIGCOUNT) {
-			printf("no best edge found, terminating\n");
-            fclose(ofp);
-			exit(1);
-		}
+	FILE *logfp = fopen("../log/cycliclog.txt","a");
+	FILE *ofp = fopen("../data/cyclicr66.txt","a");
+	int try;
+	for (try=0;try<s;try++){
+		memset(g,0,gsize*gsize*sizeof(int));
+		for (i=0;i<gsize;i++)
+			g[i] = 0;
 		
-		/*
-		 * keep the best flip we saw
-		 */
-		g[best_i*gsize+best_j] = 1 - g[best_i*gsize+best_j];
+		for (j=0;j<k;j++)
+			g[ret[try*k+j]] = 1;
+		for (i=gsize-1;i>n;i--)
+			g[i] = g[gsize-i];
 
-		/*
-		 * taboo this graph configuration so that we don't visit
-		 * it again
-		 */
-		//count = CliqueCount(g,gsize);
-		FIFOInsertEdge(taboo_list,best_i,best_j);
-//		FIFOInsertEdgeCount(taboo_list,best_i,best_j,count);
-        ffct = FIFOCount(taboo_list);
-        
-		if (ffct % 10 == 1 || (ffct >= gsize * maxlin(6,gsize/10) && psen >= gsize*3)){
-            FILE* logfp = fopen("../log/log.txt","a");
-            fprintf(logfp,"ce sz: %d, b_ct: %d, b_eg: (%d,%d), new c: %d psen: %d q sz:%d ini:%d\n",
-			gsize,
-			best_count,
-			best_i,
-			best_j,
-			g[best_i*gsize+best_j],
-			psen,
-			ffct,
-            ini);
-            fclose(logfp);
-        }
-        if (ini > 0){
-            outputtofile("Reset 100 Edges\n");
-            fflush(stdout);
-            for (ini=0;ini<100;ini++){
-                i = rand()%gsize;
-                j = rand()%gsize;
-                if (i<=j)
-                    g[i*gsize+j] = 1 - g[i*gsize+j];
-                else
-                    g[j*gsize+i] = 1 - g[j*gsize+i];
-            }
-            taboo_list = FIFOResetEdge(taboo_list);
-            PrintGraph(g,gsize,ofp);
-        }
-        
-		if ((1==0) && (ffct >= gsize * maxlin(6,gsize/10) && psen >= gsize*3)){
-			// Roll Back all the changes
-			for(i=0; i < gsize; i++)
-			{
-				for(j=i+1; j < gsize; j++)
-				{
-					if (FIFOFindEdge(taboo_list,i,j))
-						g[i*gsize+j] = 1-g[i*gsize+j];
-
-				}
-			}
-			taboo_list = FIFOResetEdge(taboo_list);
-			// Regenerate from n to n + 1
-			for(i=0; i < (gsize); i++)
-			{
-				new_g[i*(gsize) + gsize-1] = rand() % 2; // last column
-				new_g[(gsize-1)*gsize + i] = 0; // last row
-			}
-            rbk++;
-            if (rbk % 10 == 0)
-                printf("--Regenerate: %d\n",rbk);
+		for (i=1;i<gsize;i++){
+			for (j=i+1;j<gsize;j++)
+				g[i*gsize+j] = g[j-i];
 		}
-		/*
-		 * rinse and repeat
-		 */
+
+		count = CliqueCount(g,gsize);
+		if (try % 100 == 0)
+			fprintf(logfp,"%d %d\n",try,count);
+		if (count == 0){
+			printf("Eureka!  Counter-example found! %d\n",try);
+			PrintGraph(g,gsize,ofp);
+		}
+		if (s-try<10){
+			for (j=0;j<gsize;j++){
+				fprintf(logfp,"%d ",ret[try*k+j]);
+				fprintf(logfp,"\n");
+			}
+		}
 	}
-
-	FIFODeleteGraph(taboo_list);
-    fclose(ofp);
-
+	fclose(ofp);
+	fclose(logfp);
 	return(0);
 
 }

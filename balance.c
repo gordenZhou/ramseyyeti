@@ -637,6 +637,7 @@ int main(int argc,char *argv[])
         if (ini > 0){
             outputtofile("Reset 100 Edges\n");
             fflush(stdout);
+            FILE* logfp = fopen("../log/balancelog.txt","a");
             for (i=0;i<gsize;i++){
             	ones = 0;
             	for (j=0;j<gsize;j++){
@@ -673,9 +674,11 @@ int main(int argc,char *argv[])
 	            			
         			}
         		}
-        		if (abs(ones - gsize/2) >= 3)
-        			outputtofile("one's: %d at line %d, flip:%d\n",ones,i,flips);
+        		if (abs(ones - gsize/2) >= 3){
+        			fprintf(logfp,"one's: %d at line %d, flip:%d\n",ones,i,flips);
+        		}
             }
+            fclose(logfp);
             taboo_list = FIFOResetEdge(taboo_list);
             PrintGraph(g,gsize,ofp);
         }
