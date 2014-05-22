@@ -10,7 +10,7 @@ PRED=.
 BOBJ=$(COMMON)/jval.o $(COMMON)/jrb.o $(COMMON)/dllist.o $(COMMON)/fifo.o
 LIBS= -lm 
 
-PROGRAMS = simple_taboo_search simple_taboo_search-6 cyclic
+PROGRAMS = simple_taboo_search simple_taboo_search-6 cyclic balance
 
 all: $(PROGRAMS)
 
@@ -23,6 +23,9 @@ simple_taboo_search-6: simple_taboo_search-6.c $(INCL) ${BOBJ}
 
 cyclic: cyclic.c $(INCL) ${BOBJ}
 	$(COMPILE) ${INCLUDES} -o cyclic cyclic.c $(BOBJ) $(LIBS)
+
+balance: balance.c $(INCL) ${BOBJ}
+	$(COMPILE) ${INCLUDES} -o balance balance.c $(BOBJ) $(LIBS)
 
 
 fifo.o: fifo.c fifo.h jrb.h jval.h dllist.h
