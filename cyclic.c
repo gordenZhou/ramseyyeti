@@ -373,9 +373,9 @@ void* CliqueCountLin(int *g,
     return(edge_list);
 }
 
-int* iterategenrow(int gsize){
+int* iterategenrow(int gsize,FILE* ofp){
 	// set a cap for the news, then we can have different range of combinations.
-	printf("Start Iterating %d\n",gsize);
+	fprintf(ofp,"Start Iterating %d\n",gsize);
     int n = gsize/2;
     int k = n/2;
 
@@ -456,7 +456,7 @@ int* iterategenrow(int gsize){
 	            }
                 news++;
             }
-            if (news > 100000)
+            if (news > 1000000)
             	break;
         }
         newret = (int *)malloc((news)*(d+1)*sizeof(int));
@@ -518,18 +518,18 @@ int* iterategenrow(int gsize){
                 newret[news*(d+1)+d] = j;
                 news++;
         	}
-        	if (news > 100000)
+        	if (news > 1000000)
             	break;
         }
         free(ret);
         ret = newret;
         s = news;
     }
-    printf("(%d,%d) = %d\n",n,k,s);
+    fprintf(ofp,"(%d,%d) = %d\n",n,k,s);
     for(i=0;i<3;i++){
     	for(j=0;j<k;j++)
-    		printf("%d ",ret[k*i+j]);
-    	printf("\n");
+    		fprintf(ofp,"%d ",ret[k*i+j]);
+    	fprintf(ofp,"\n");
     }
     ret[0] = s;
     return ret;
@@ -611,12 +611,14 @@ int main(int argc,char *argv[])
 	
     int k;
     
-    gsize = 69;
+    gsize = 99;
     int n = gsize/2;
     k = n/2;
 
     //randomgenrow(99);
-    int* ret = iterategenrow(gsize);
+    FILE *logfp = fopen("../log/cycliclog.txt","a");
+	FILE *ofp = fopen("../data/cyclicr66.txt","a");
+    int* ret = iterategenrow(gsize,logfp);
     int s = ret[0];
     ret[0] = 1; 
     if (1 == 2){
@@ -634,8 +636,7 @@ int main(int argc,char *argv[])
     /*
 	 * start out with random
 	 */
-	FILE *logfp = fopen("../log/cycliclog.txt","a");
-	FILE *ofp = fopen("../data/cyclicr66.txt","a");
+	
 	int try;
 	for (try=0;try<s;try++){
 		memset(g,0,gsize*gsize*sizeof(int));
@@ -653,17 +654,17 @@ int main(int argc,char *argv[])
 		}
 
 		count = CliqueCount(g,gsize);
-		if (try % 100 == 0)
+		if (try % 1000 == 0)
 			fprintf(logfp,"%d %d\n",try,count);
 		if (count == 0){
-			printf("Eureka!  Counter-example found! %d\n",try);
+			fprintf(logfp,"Eureka!  Counter-example found! %d\n",try);
 			PrintGraph(g,gsize,ofp);
 		}
 		if (s-try<10){
-			for (j=0;j<gsize;j++){
+			for (j=0;j<k;j++){
 				fprintf(logfp,"%d ",ret[try*k+j]);
-				fprintf(logfp,"\n");
 			}
+			fprintf(logfp,"\n");
 		}
 	}
 	fclose(ofp);
