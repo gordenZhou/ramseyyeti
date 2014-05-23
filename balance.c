@@ -89,8 +89,8 @@ int maxlin(int a,int b){
 	return b;
 }
 
-void outputtofile(char* ostr){
-    FILE* oofp = fopen("../log/balancelog.txt","a");
+void outputtofile(char* ostr,char* logfileName){
+    FILE* oofp = fopen(logfileName,"a");
     fprintf(oofp,"%s",ostr);
     fclose(oofp);
 }
@@ -375,6 +375,10 @@ void* CliqueCountLin(int *g,
 
 int main(int argc,char *argv[])
 {
+	if (argc < 2){
+		printf("usage: %s file_suffix\n",argv[0]);
+		return 1;
+	}
     srand(time(NULL));
 	int *g;
 	int *new_g;
@@ -437,8 +441,13 @@ int main(int argc,char *argv[])
     if(edge_list == NULL) {
 		exit(1);
 	}
-	
-    FILE *ofp = fopen("../data/balancer66.txt","w");
+
+	char logfileName[120];
+	sprintf(logfileName,"../log/balancelog_%s.txt",argv[1]);
+	char datafileName[120];
+	sprintf(datafileName,"../data/balancer66_%s.txt",argv[1]);
+
+    FILE *ofp = fopen(datafileName,"w");
 	/*
 	 * while we do not have a publishable result
 	 */
@@ -628,7 +637,7 @@ int main(int argc,char *argv[])
         
 		if (checkcount % 10 == 1 || (ffct >= gsize * maxlin(6,gsize/10) && psen >= gsize*3)){
 			ffct = FIFOCount(taboo_list);
-            FILE* logfp = fopen("../log/balancelog.txt","a");
+            FILE* logfp = fopen(logfileName,"a");
             fprintf(logfp,"ce sz: %d, b_ct: %d, b_eg: (%d,%d), new c: %d psen: %d q sz:%d ini:%d\n",
 			gsize,
 			best_count,
@@ -641,7 +650,7 @@ int main(int argc,char *argv[])
             fclose(logfp);
         }
         if (ini > 0){
-        	outputtofile("Reset 120 Edges\n");
+        	outputtofile("Reset 120 Edges\n",logfileName);
         	for (ini=0;ini<120;ini++){
                 i = rand()%gsize;
                 j = rand()%gsize;
@@ -651,9 +660,9 @@ int main(int argc,char *argv[])
                     g[j*gsize+i] = 1 - g[j*gsize+i];
             }
             
-            outputtofile("Reset Edges To Balance\n");
+            outputtofile("Reset Edges To Balance\n",logfileName);
             
-            FILE* logfp = fopen("../log/balancelog.txt","a");
+            FILE* logfp = fopen(logfileName,"a");
             for (i=0;i<gsize;i++){
             	ones = 0;
             	for (j=0;j<gsize;j++){
