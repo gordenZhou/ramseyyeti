@@ -168,6 +168,7 @@ int CliqueCount(int *g,
 						   (g[i*gsize+j] 
 							== g[m*gsize+n])) {
 			      					count++;
+			      				return count;
 						}
 					}
 				}
@@ -384,17 +385,17 @@ int* iterategenrow(int gsize,FILE* ofp){
 
     int end;
 
-    int i,j,d;
+    int i,j,d,ii;
     int same;
 
-    int *ret = (int *)malloc((n-k+1)*sizeof(int));
+    int *ret = (int *)malloc((n-k)*sizeof(int));
     int *row = (int *)malloc((n+1)*sizeof(int));
     int *wholerow = (int *)malloc(gsize*sizeof(int));
     int *newret;
-    for(i=1;i<n-k+2;i++){
-        ret[i-1] = i;
+    for(i=2;i<n-k+2;i++){
+        ret[i-2] = i;
     }
-    s = n-k+1;
+    s = n-k;
 
     int x,step,kk;
     for (d=1;d<k;d++){
@@ -431,6 +432,20 @@ int* iterategenrow(int gsize,FILE* ofp){
 								same++;
 						if (same >= 5)
 							break;
+
+						same = 1;
+	                    for (kk=1;kk<4;kk++)
+	                    	if (wholerow[kk*step] == wholerow[(kk+1)*step])
+	                            same++;
+	                	if (same >= 4)
+	                		for (ii=1;ii<=gsize-1-4*step;ii++)
+	                			if (wholerow[ii] == wholerow[step] && wholerow[ii+step] == wholerow[step] && wholerow[ii+2*step] == wholerow[step]
+	                				&& wholerow[ii+3*step] == wholerow[step] && wholerow[ii+4*step] == wholerow[step]){
+	                				same = 5;
+	                				break;
+	                			}
+	                	if (same >= 5)
+	                    	break;
 					}
 					row[j] = 0;
 					wholerow[j] = row[j];
@@ -447,6 +462,20 @@ int* iterategenrow(int gsize,FILE* ofp){
 	                        if (row[kk*step] == row[(kk+1)*step])
 	                            same++;
 	                    if (same >= 5)
+	                    	break;
+
+	                    same = 1;
+	                    for (kk=1;kk<4;kk++)
+	                    	if (row[kk*step] == row[(kk+1)*step])
+	                            same++;
+	                	if (same >= 4)
+	                		for (ii=1;ii<=j-4*step;ii++)
+	                			if (row[ii] == row[step] && row[ii+step] == row[step] && row[ii+2*step] == row[step]
+	                				&& row[ii+3*step] == row[step] && row[ii+4*step] == row[step]){
+	                				same = 5;
+	                				break;
+	                			}
+	                	if (same >= 5)
 	                    	break;
 	                }
 	                row[j] = 0;
@@ -492,6 +521,21 @@ int* iterategenrow(int gsize,FILE* ofp){
 								same++;
 						if (same >= 5)
 							break;
+
+
+						same = 1;
+	                    for (kk=1;kk<4;kk++)
+	                    	if (wholerow[kk*step] == wholerow[(kk+1)*step])
+	                            same++;
+	                	if (same >= 4)
+	                		for (ii=1;ii<=gsize-1-4*step;ii++)
+	                			if (wholerow[ii] == wholerow[step] && wholerow[ii+step] == wholerow[step] && wholerow[ii+2*step] == wholerow[step]
+	                				&& wholerow[ii+3*step] == wholerow[step] && wholerow[ii+4*step] == wholerow[step]){
+	                				same = 5;
+	                				break;
+	                			}
+	                	if (same >= 5)
+	                    	break;
 					}
 					row[j] = 0;
 					wholerow[j] = row[j];
@@ -502,11 +546,26 @@ int* iterategenrow(int gsize,FILE* ofp){
 				else{
 					end = j/5;
 	                for(step=1;step <= end;step++){
+
 	                    same = 1;
 	                    for(kk=1;kk<5;kk++)
 	                        if (row[kk*step] == row[(kk+1)*step])
 	                            same++;
 	                    if (same >= 5)
+	                    	break;
+
+	                    same = 1;
+	                    for (kk=1;kk<4;kk++)
+	                    	if (row[kk*step] == row[(kk+1)*step])
+	                            same++;
+	                	if (same >= 4)
+	                		for (ii=1;ii<=j-4*step;ii++)
+	                			if (row[ii] == row[step] && row[ii+step] == row[step] && row[ii+2*step] == row[step]
+	                				&& row[ii+3*step] == row[step] && row[ii+4*step] == row[step]){
+	                				same = 5;
+	                				break;
+	                			}
+	                	if (same >= 5)
 	                    	break;
 	                }
 	                row[j] = 0;
@@ -526,10 +585,14 @@ int* iterategenrow(int gsize,FILE* ofp){
         s = news;
     }
     fprintf(ofp,"(%d,%d) = %d\n",n,k,s);
+    printf("(%d,%d) = %d\n",n,k,s);
     for(i=0;i<3;i++){
-    	for(j=0;j<k;j++)
-    		fprintf(ofp,"%d ",ret[k*i+j]);
+    	for(j=0;j<k;j++){
+			fprintf(ofp,"%d ",ret[k*i+j]);
+			printf("%d ",ret[k*i+j]);
+    	}
     	fprintf(ofp,"\n");
+    	printf("\n");
     }
     ret[0] = s;
     return ret;
@@ -546,7 +609,7 @@ void randomgenrow(int gsize){
     int a = 1;
     int step = 0;
     int tt = 0;
-    FILE* logfp = fopen("../log/cyclog.txt","a");
+    FILE* logfp = fopen("../log/cycliclog.txt","a");
     while (a == 1){
 
         r[0] = 0;
@@ -621,7 +684,7 @@ int main(int argc,char *argv[])
     int* ret = iterategenrow(gsize,logfp);
     int s = ret[0];
     ret[0] = 1; 
-    if (1 == 2){
+    if (1 == 1){
        return 1;
     }
      
