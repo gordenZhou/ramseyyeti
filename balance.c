@@ -439,7 +439,6 @@ int main(int argc,char *argv[])
 	}
 	
     FILE *ofp = fopen("../data/balancer66.txt","w");
-
 	/*
 	 * while we do not have a publishable result
 	 */
@@ -580,7 +579,7 @@ int main(int argc,char *argv[])
         if (carray[0] < best_count){
         	if (best_count > 30000)
         		i = 50;
-        	else if (best_count > 20000)
+        	else if (best_count > 12000)
         		i = 5;
         	else
         		i = 1;
@@ -642,9 +641,8 @@ int main(int argc,char *argv[])
             fclose(logfp);
         }
         if (ini > 0){
-        	outputtofile("Reset 100 Edges\n");
-
-        	for (ini=0;ini<300;ini++){
+        	outputtofile("Reset 120 Edges\n");
+        	for (ini=0;ini<120;ini++){
                 i = rand()%gsize;
                 j = rand()%gsize;
                 if (i<=j)
@@ -676,6 +674,8 @@ int main(int argc,char *argv[])
 	            			g[j*gsize+i] = 0;
 	            			flips--;
 	            		}
+	            		if (ones + flips < gsize/2)
+	            			break;
         			}	
         		}
         		if (gsize/2 - ones >= 2){
@@ -689,7 +689,8 @@ int main(int argc,char *argv[])
 	            			g[j*gsize+i] = 1;
 	            			flips++;
 	            		}
-	            			
+	            		if (ones + flips > gsize/2)
+	            			break;
         			}
         		}
         		if (abs(ones - gsize/2) >= 2){
