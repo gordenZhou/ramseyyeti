@@ -683,8 +683,8 @@ int main(int argc,char *argv[])
 	FILE *ofp = fopen("../data/cyclicr66.txt","a");
     int* ret = iterategenrow(gsize,logfp);
     int s = ret[0];
-    ret[0] = 1; 
-    if (1 == 1){
+    ret[0] = 2; 
+    if (1 == 2){
        return 1;
     }
      
