@@ -664,6 +664,13 @@ int* iterategenrow(int gsize,FILE* ofp){
 
 int main(int argc,char *argv[])
 {
+	if (argc < 2){
+		printf("usage: %s starts ends\n",argv[0]);
+		return 1;
+	}
+	int starts,ends;
+	starts = atoi(argv[1]);
+	ends = atoi(argv[2]);
 	int *g;
 	int gsize;
 	int count=0;
@@ -674,10 +681,13 @@ int main(int argc,char *argv[])
     gsize = 99;
     int n = gsize/2;
     k = n/2;
-
+    char logfileName[120];
+    char datafileName[120];
+    sprintf(logfileName,"../log/cycliclog_%d_%d.txt",starts,ends);
+    sprintf(datafileName,"../data/cyclicr66_%d_%d.txt",starts,ends);
     //randomgenrow(99);
-    FILE *logfp = fopen("../log/cycliclog.txt","a");
-	FILE *ofp = fopen("../data/cyclicr66.txt","a");
+    FILE *logfp = fopen(logfileName,"a");
+	FILE *ofp = fopen(datafileName,"a");
     int* ret = iterategenrow(gsize,logfp);
 
     int* finalret;
@@ -699,7 +709,7 @@ int main(int argc,char *argv[])
 	int si,try,finals;
 	int* mid = (int *)malloc(d*sizeof(int));
 
-	for (si=0;si<s;si++){
+	for (si=starts;si<ends;si++){
 		for (i=0;i<d;i++)
 			mid[i] = ret[si*d+i];
 
